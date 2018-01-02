@@ -49,6 +49,7 @@ namespace Fluid.Tests
                 FileProvider = new MockFileProvider("Partials")
             };
             var expectedResult = @"Partial Content
+File Name: 'Partials\_Partial.liquid'
 Partials: ''
 color: ''
 shape: ''";
@@ -73,6 +74,7 @@ shape: ''";
                 FileProvider = new MockFileProvider("Partials")
             };
             var expectedResult = @"Partial Content
+File Name: 'Partials\_Partial.liquid'
 Partials: ''
 color: 'blue'
 shape: 'circle'";
@@ -93,11 +95,56 @@ shape: 'circle'";
                 FileProvider = new MockFileProvider("Partials")
             };
             var expectedResult = @"Partial Content
+File Name: 'Partials\color.liquid'
 Partials: ''
 color: 'blue'
 shape: ''";
 
             await new IncludeStatement(pathExpression, with: withExpression).WriteToAsync(sw, HtmlEncoder.Default, context);
+
+            Assert.Equal(expectedResult, sw.ToString());
+        }
+
+        [Fact]
+        public async Task IncludeSatement_WithNoFilePathFactory_ShouldUseOrginalFilePath()
+        {
+            var expression = new LiteralExpression(new StringValue("_Partial.liquid"));
+            var sw = new StringWriter();
+            var context = new TemplateContext
+            {
+                FileProvider = new MockFileProvider("Partials")
+            };
+
+            var expectedResult = @"Partial Content
+File Name: 'Partials\_Partial.liquid'
+Partials: ''
+color: ''
+shape: ''";
+
+            await new IncludeStatement(expression).WriteToAsync(sw, HtmlEncoder.Default, context);
+
+            Assert.Equal(expectedResult, sw.ToString());
+        }
+
+        [Fact]
+        public async Task IncludeSatement_WithFilePathFactory_ShouldUseAlteredFilePath()
+        {
+            var expression = new LiteralExpression(new StringValue("_Partial.liquid"));
+            var sw = new StringWriter();
+            var context = new TemplateContext
+            {
+                FileProvider = new MockFileProvider("Partials")
+            };
+
+            context.AmbientValues[IncludeStatement.FluidFilePathFactoryKey] = new MockFilePathFactory();
+
+            var expectedResult = @"Partial Content
+File Name: 'Partials\My\Custom\Path\_Partial.liquid'
+Partials: ''
+color: ''
+shape: ''";
+
+            await new IncludeStatement(expression).WriteToAsync(sw, HtmlEncoder.Default, context);
 
             Assert.Equal(expectedResult, sw.ToString());
         }

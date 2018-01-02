@@ -9,6 +9,12 @@ namespace Fluid.Ast
     public class IncludeStatement : Statement
     {
         /// <summary>
+        /// Override <see cref="IFluidFilePathFactory"/> used by a <see cref="TemplateContext"/>
+        /// by setting an ambient value with a key matching the value of the
+        /// <see cref="FluidFilePathFactoryKey"/>.
+        /// </summary>
+        public const string FluidFilePathFactoryKey = "FluidFilePathFactory";
+        /// <summary>
         /// Override <see cref="IFluidParserFactory"/> used by a <see cref="TemplateContext"/>
         /// by setting an ambient value with a key matching the value of the
         /// <see cref="FluidParserFactoryKey"/>.
@@ -44,7 +50,7 @@ namespace Fluid.Ast
             }
 
             var fileProvider = context.FileProvider ?? TemplateContext.GlobalFileProvider;
-            var fileInfo = fileProvider.GetFileInfo(relativePath);
+            var fileInfo = fileProvider.GetFileInfo(CreateFilePath(context, relativePath));
 
             if (!fileInfo.Exists)
             {
@@ -87,6 +93,18 @@ namespace Fluid.Ast
             }
 
             return Completion.Normal;
+        }
+
+        private static string CreateFilePath(TemplateContext context, string fileName)
+        {
+            if (context.AmbientValues.TryGetValue(FluidFilePathFactoryKey, out var factory))
+            {
+                return ((IFluidFilePathFactory)factory).CreateFilePath(fileName);
+            }
+            else
+            {
+                return fileName;
+            }
         }
 
         private static IFluidParser CreateParser(TemplateContext context)

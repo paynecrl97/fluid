@@ -500,6 +500,7 @@ Parent Content
 color: '{{ color }}'
 shape: '{{ shape }}'";
             var expected = @"Partial Content
+File Name: 'Partials\Partials.liquid'
 Partials: ''
 color: 'red'
 shape: 'circle'
@@ -525,6 +526,7 @@ shape: ''";
 Parent Content
 {{ Partials }}";
             var expected = @"Partial Content
+File Name: 'Partials\Partials.liquid'
 Partials: 'included value'
 color: ''
 shape: ''
