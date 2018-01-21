@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Fluid.Ast;
@@ -13,6 +11,34 @@ namespace Fluid.Tests
 {
     public class ForStatementTests
     {
+        [Fact]
+        public async Task ShouldMaintainVariableValues()
+        {
+            const string expectedValue = "New Value";
+
+            var context = new TemplateContext();
+            var a = new AssignStatement("a", new LiteralExpression(new StringValue("Original Value")));
+
+            var loop = new ForStatement(
+                new[] { new AssignStatement("a", new LiteralExpression(new StringValue(expectedValue))) },
+                "i",
+                new RangeExpression(
+                    new LiteralExpression(new NumberValue(1)),
+                    new LiteralExpression(new NumberValue(2))
+                ),
+                null, null, false
+            );
+            var sw = new StringWriter();
+            await a.WriteToAsync(sw, HtmlEncoder.Default, context);
+            await loop.WriteToAsync(sw, HtmlEncoder.Default, context);
+
+            FluidTemplate.TryParse("{{a}}", out var template, out var messages);
+            
+            var result = await template.RenderAsync(context);
+
+            Assert.Equal(expectedValue, result);
+        }
+
         [Fact]
         public async Task ShouldLoopRange()
         {

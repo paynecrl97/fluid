@@ -11,7 +11,8 @@ namespace Fluid.MvcSample.Controllers
             var model = new List<Person>();
             model.Add(new Person { Firstname = "Bill", Lastname = "Gates" });
             model.Add(new Person { Firstname = "Steve", Lastname = "Balmer" });
-            
+            model.Add(new Person { Firstname = "Satya", Lastname = "Nadella" });
+
             ViewData["Title"] = "This is a title";
 
             return View(model);

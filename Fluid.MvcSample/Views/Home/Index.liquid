@@ -2,9 +2,18 @@ Hello World from Liquid 2
 
 <h1>{{ ViewData["Title"] }}</h1>
 
+{% assign secondPerson = Model | first %}
 {% for p in Model %}
-  <p>{{ p.Firstname }} {{ p.Lastname }}</p>
+<p>
+    {{ p.Firstname }} {{ p.Lastname }}
+    {% if forloop.index == 2 %}
+    {% assign secondPerson = p %}
+    (This is the second person - {{ secondPerson.Firstname }} {{ secondPerson.Lastname }})
+    {% endif %}
+</p>
 {% endfor %}
+
+Second person was: {{ secondPerson.Firstname }} {{ secondPerson.Lastname }}
 
 {% assign invoker = 'Index' %}
 {% include 'Home/_Partial' %}
